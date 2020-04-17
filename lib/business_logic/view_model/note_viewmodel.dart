@@ -4,14 +4,28 @@ import 'package:notekeeper_flutter_solo/business_logic/view_model/all_notes_view
 import 'package:notekeeper_flutter_solo/services/database/database.dart';
 import 'package:notekeeper_flutter_solo/services/service_locator.dart';
 
-class NoteViewModel extends ChangeNotifier{
-  NoteViewModel({@required Note note});
+class NoteViewModel extends ChangeNotifier {
+  final DatabaseAbs _databaseService = serviceLocator<DatabaseAbs>();
+  final AllNotesModel _allNotesModel = serviceLocator<AllNotesModel>();
 
-  final Database _databaseService = serviceLocator<Database>();
-  final AllNotesModel allNotesModel = AllNotesModel();
+  void createNewNote({@required String title, @required String note}) async {
+    // if title is empty store as null
+    Note newNote = Note(title: title, note: note);
+    int result = await _databaseService.createNote(newNote: newNote);
+    _allNotesModel.loadNotes();
+    print("Creating note result: $result");
+  }
 
-  Future<void> createNewNote({@required Note newNote}){
-    _databaseService.createNote(newNote: newNote);
-    allNotesModel.loadNotes();
+  void saveNote(
+      {@required Note note, String titleText, String noteText}) async {
+    // index for database sim
+    await _databaseService.saveNote(
+        note: note, titleText: titleText, noteText: noteText);
+    _allNotesModel.loadNotes();
+  }
+
+  void deleteNote({@required Note note}) async {
+    await _databaseService.deleteNote(note: note);
+    _allNotesModel.loadNotes();
   }
 }

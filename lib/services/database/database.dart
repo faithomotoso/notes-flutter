@@ -1,14 +1,21 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:notekeeper_flutter_solo/business_logic/model/Note.dart';
+import 'package:sqflite/sqflite.dart';
 
-abstract class Database{
+abstract class DatabaseAbs{
+  Future<Database> openDb();
+
+  Future<void> onCreateDb(Database db, int version);
+
+  Future<dynamic> init();
+
   Future<List<Note>> getAllNotes();
 
-  Future<void> createNote({@required Note newNote});
+  Future<int> createNote({@required Note newNote});
 
-  Future<void> saveNote({@required Note note});
+  Future<int> saveNote({@required Note note, String titleText, String noteText});
 
-  Future<void> deleteNote({@required Note note});
+  Future<int> deleteNote({@required Note note});
 
 }

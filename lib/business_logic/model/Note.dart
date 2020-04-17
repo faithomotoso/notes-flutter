@@ -1,39 +1,48 @@
 /*
 *
 *   Database Structure
-*     id, note, created_at, modified_at
+*     id, title, note, created_at, modified_at
 *
 * */
 
+import 'package:notekeeper_flutter_solo/services/database/db_names.dart';
+
 class Note{
-  int id; // from database?
+  int id; // from database
   String title;
   String note;
   String createdAt;
   String modifiedAt;
 
   Note({
-    this.title,
+    this.title = '',
     this.note,
     this.createdAt,
     this.modifiedAt
 });
 
+
+  @override
+  String toString() {
+    super.toString();
+    return "Title: $title, Note: $note";
+  }
+
   Note.fromMap(Map<String, dynamic> map){
-    this.id = map['id'];
-    this.title = map['title'];
-    this.note = map['note'];
-    this.createdAt = map['created_at'];
-    this.modifiedAt = map['modified_at'];
+    this.id = map[DbNames.idCol];
+    this.title = map[DbNames.titleTextCol];
+    this.note = map[DbNames.noteTextCol];
+    this.createdAt = map[DbNames.createdAtCol];
+    this.modifiedAt = map[DbNames.modifiedAtCol];
   }
 
   toMap(){
     return Map<String, dynamic>.from({
-      "id": this.id,
-      "title": this.title,
-      "note": this.note,
-      "created_at": this.createdAt,
-      "modified_at": this.modifiedAt
+//      DbNames.idCol: this.id,
+      DbNames.titleTextCol: this.title,
+      DbNames.noteTextCol: this.note,
+      DbNames.createdAtCol: this.createdAt,
+      DbNames.modifiedAtCol: this.modifiedAt
     });
   }
 }

@@ -1,8 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:notekeeper_flutter_solo/business_logic/model/Note.dart';
 import 'package:notekeeper_flutter_solo/services/database/database.dart';
+import 'package:sqflite/sqflite.dart';
 
-class DatabaseSim implements Database {
+class DatabaseSim implements DatabaseAbs {
   List<Note> _notes = [];
+
   List<Note> get notes => _notes;
 
   @override
@@ -23,20 +26,46 @@ class DatabaseSim implements Database {
   }
 
   @override
-  Future<void> createNote({Note newNote}) {
-    _notes.add(newNote);
+  Future<int> createNote({Note newNote}) {
+//    _notes.add(newNote);
+    newNote.createdAt = DateTime.now().toString();
+    _notes.insert(0, newNote);
     return null;
   }
 
   @override
-  Future<void> deleteNote({Note note}) {
-    _notes.removeAt(note.id);
+  Future<int> deleteNote({Note note}) {
+//    _notes.removeAt(note.id);
+    _notes.removeWhere((n) => n == note);
     return null;
   }
 
   @override
-  Future<void> saveNote({Note note}) {
-    _notes[note.id] = note;
+  Future<int> saveNote(
+      {@required Note note, String titleText, String noteText}) {
+    // for database use note.id
+    int i = _notes.indexWhere((n) => n == note);
+    note.title = titleText;
+    note.note = noteText;
+    note.modifiedAt = DateTime.now().toString();
+    _notes[i] = note;
+    return null;
+  }
+
+  @override
+  Future<void> onCreateDb(Database db, int version) {
+    // TODO: implement onCreateDatabase
+  }
+
+  @override
+  Future<Database> openDb() {
+    // TODO: implement openDatabase
+    return null;
+  }
+
+  @override
+  Future init() {
+    // TODO: implement init
     return null;
   }
 }
