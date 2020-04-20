@@ -8,8 +8,10 @@ import 'package:notekeeper_flutter_solo/services/database/database_sim.dart';
 GetIt serviceLocator = GetIt.instance;
 
 void setupServiceLocator(){
-  serviceLocator.registerLazySingleton<DatabaseAbs>(() => DatabaseService());
+  serviceLocator.registerLazySingleton<DatabaseAbs>(() => DatabaseService()); // problem with scalability use for mocking only
+  serviceLocator.registerLazySingleton<DatabaseService>(() => DatabaseService());
 
   serviceLocator.registerLazySingleton<NoteViewModel>(() => NoteViewModel());
   serviceLocator.registerLazySingleton<AllNotesModel>(() => AllNotesModel());
+
 }

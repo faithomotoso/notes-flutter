@@ -18,95 +18,128 @@ class Home extends StatefulWidget {
   State<StatefulWidget> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with TickerProviderStateMixin {
   Dimens dimens;
+  AnimationController _animationController;
+  Animation _colorAnimation;
 
   @override
   void initState() {
     super.initState();
     Provider.of<AllNotesModel>(context, listen: false).loadNotes();
+
+    _animationController = AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: 400),
+        reverseDuration: Duration(milliseconds: 300));
   }
 
   @override
   Widget build(BuildContext context) {
     dimens = Dimens(context);
     final NoteViewModel _noteViewModel = Provider.of<NoteViewModel>(context);
-    final AllNotesModel _allNotesModel = Provider.of<AllNotesModel>(context, listen: true);
+    final AllNotesModel _allNotesModel = Provider.of<AllNotesModel>(context);
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: appBar(title: "Notes"),
-      floatingActionButton: OpenContainer(
-        transitionType: ContainerTransitionType.fadeThrough,
-        closedElevation: 6.0,
-        closedShape: CircleBorder(),
-        openBuilder: (BuildContext context, VoidCallback _){
-          return CreateEditNote();
-        },
-        closedBuilder: (BuildContext context, VoidCallback openContainer){
-          return FloatingActionButton(
-            onPressed: openContainer,
-            child: Icon(
-              Icons.add,
-              color: Colors.white,
-                size: 25,
-            ),
-            tooltip: "Add New Note",
-          );
-        },
-      ),
-      body: Container(
-        padding: EdgeInsets.all(5),
-        child: ChangeNotifierProvider.value(
-          value: _allNotesModel,
-          child: Consumer<AllNotesModel>(
-            builder: (context, allNotesModel, child){
-              return StaggeredGridView.extentBuilder(
-//            crossAxisCount: 3,
-                maxCrossAxisExtent: dimens.width / 2,
-                itemCount: allNotesModel.allNotes.length,
-                itemBuilder: (BuildContext context, int index) {
-                  Note indexNote = allNotesModel.allNotes[index];
-//                  return InkWell(
-//                    onTap: () {},
-//                    child: Container(
-////                  height: 10,
-////                  width: 50,
-//                      decoration: BoxDecoration(
-//                          border: Border.all(color: primaryColor),
-//                          borderRadius: BorderRadius.circular(10)),
-//                      padding: EdgeInsets.all(14),
-//                      child: Column(
-//                        crossAxisAlignment: CrossAxisAlignment.start,
-//                        children: <Widget>[
-//                          indexNote.title != null ?
-//                          Text(indexNote.title, style: titleTextStyle(context: context),)
-//                              : SizedBox(),
-//                          SizedBox(
-//                            height: indexNote.title != null ? 6 : 0,
-//                          ),
-//                          indexNote.note.isNotEmpty ? Text(indexNote.note,
-//                            maxLines: 3,
-//                            overflow: TextOverflow.ellipsis,) : SizedBox()
-//                        ],
-//                      ),
-//                    ),
+    _allNotesModel.mode.addListener(() {
+      if (_allNotesModel.mode.value) {
+        _animationController.forward();
+      } else {
+        _animationController.reverse();
+      }
+    });
+
+    _colorAnimation = ColorTween(
+            begin: Theme.of(this.context).primaryColor, end: Colors.white)
+        .animate(CurvedAnimation(
+            curve: Curves.fastOutSlowIn, parent: _animationController));
+
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            title: Text("Notes"),
+            backgroundColor: _colorAnimation.value,
+            actions: <Widget>[
+              _allNotesModel.mode.value
+                  ? IconButton(
+                      onPressed: () async {
+                        await _allNotesModel.deleteSelectedNotes();
+//                        print(_allNotesModel.allNotes[_allNotesModel.allNotes.indexWhere((note) => note.title == "sample 8")]);
+                        print(_allNotesModel.allNotes[2]);
+                      },
+                      icon: Icon(CupertinoIcons.delete,
+                          size: 26, color: Colors.black),
+                    )
+                  : SizedBox()
+            ],
+          ),
+          floatingActionButton: OpenContainer(
+            transitionType: ContainerTransitionType.fadeThrough,
+            closedElevation: 6.0,
+            closedShape: CircleBorder(),
+            openBuilder: (BuildContext context, VoidCallback _) {
+              return CreateEditNote();
+            },
+            closedBuilder: (BuildContext context, VoidCallback openContainer) {
+              return FloatingActionButton(
+                onPressed: openContainer,
+                child: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                  size: 25,
+                ),
+                tooltip: "Add New Note",
+              );
+            },
+          ),
+          body: Container(
+            padding: EdgeInsets.all(5),
+            child: ChangeNotifierProvider.value(
+              value: _allNotesModel,
+              child: Consumer<AllNotesModel>(
+                builder: (context, allNotesModel, child) {
+//                  return StaggeredGridView.extentBuilder(
+////            crossAxisCount: 3,
+//                    maxCrossAxisExtent: dimens.width / 2,
+//                    itemCount: allNotesModel.allNotes.length,
+//                    itemBuilder: (BuildContext context, int index) {
+//                      Note indexNote = allNotesModel.allNotes[index];
+//                      print("Index Note - index $index: $indexNote");
+//                      return NoteCard(
+//                        note: indexNote,
+////                    selectionMode: _longPressActivated,
+//                        selectionMode: allNotesModel.mode.value,
+//                      );
+//                    },
+//                    staggeredTileBuilder: (int index) => StaggeredTile.fit(1),
+//                    mainAxisSpacing: 10,
+//                    crossAxisSpacing: 10,
 //                  );
-                  return NoteCard(
-                    note: indexNote,
-                    onLongPress: (){
-                      print("Long press activated");
+
+                // changed to listview, thought there was an issue with the gridview package
+                  return ListView.separated(
+                    separatorBuilder: (context, index) {
+                      return SizedBox(
+                        height: 6,
+                      );
+                    },
+                    itemCount: allNotesModel.allNotes.length,
+                    itemBuilder: (context, index) {
+                      Note indexNote = allNotesModel.allNotes[index];
+//                      print("Index Note - index $index: $indexNote");
+                      return NoteCard(
+                        note: indexNote,
+                      );
                     },
                   );
                 },
-                staggeredTileBuilder: (int index) =>
-                    StaggeredTile.fit(1),
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,);
-            },
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

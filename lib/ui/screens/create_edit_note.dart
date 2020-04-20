@@ -27,6 +27,9 @@ class _CreateEditNoteState extends State<CreateEditNote> {
   final TextEditingController noteController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
+  String _oldTitleText;
+  String _oldNoteText;
+
 
   @override
   void initState() {
@@ -34,6 +37,9 @@ class _CreateEditNoteState extends State<CreateEditNote> {
     if (widget.note != null){
       titleController.text = widget.note.title;
       noteController.text = widget.note.note;
+
+      _oldTitleText = widget.note.title;
+      _oldNoteText = widget.note.note;
     }
   }
 
@@ -143,7 +149,10 @@ class _CreateEditNoteState extends State<CreateEditNote> {
               );
             }
           } else {
-            noteViewModel.saveNote(note: widget.note, titleText: titleController.text, noteText: noteController.text);
+            if (!(_oldNoteText == noteController.text) || !(_oldTitleText == titleController.text)){
+              noteViewModel.saveNote(note: widget.note, titleText: titleController.text, noteText: noteController.text);
+            }
+
           }
           Navigator.pop(context);
         },

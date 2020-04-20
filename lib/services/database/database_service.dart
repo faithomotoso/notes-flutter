@@ -43,7 +43,6 @@ class DatabaseService implements DatabaseAbs {
 
   @override
   Future<int> createNote({Note newNote}) async {
-    newNote.createdAt = DateTime.now().toString();
     int result = await _db.insert(DbNames.tableName, newNote.toMap(),
         conflictAlgorithm: ConflictAlgorithm.fail);
     
@@ -59,7 +58,7 @@ class DatabaseService implements DatabaseAbs {
   @override
   Future<List<Note>> getAllNotes() async {
     final List<Map<String, dynamic>> list = await _db.query(DbNames.tableName, orderBy: "${DbNames.idCol} DESC");
-    
+
     list.forEach((map) => _notes.add(Note.fromMap(map)));
     return _notes;
   }

@@ -25,7 +25,7 @@ class Note{
   @override
   String toString() {
     super.toString();
-    return "Title: $title, Note: $note";
+    return "ID: $id - Title: $title - Note: $note";
   }
 
   Note.fromMap(Map<String, dynamic> map){
