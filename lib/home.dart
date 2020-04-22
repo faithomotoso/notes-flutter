@@ -66,7 +66,6 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                   ? IconButton(
                       onPressed: () async {
                         await _allNotesModel.deleteSelectedNotes();
-//                        print(_allNotesModel.allNotes[_allNotesModel.allNotes.indexWhere((note) => note.title == "sample 8")]);
                         print(_allNotesModel.allNotes[2]);
                       },
                       icon: Icon(CupertinoIcons.delete,
@@ -100,39 +99,72 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               value: _allNotesModel,
               child: Consumer<AllNotesModel>(
                 builder: (context, allNotesModel, child) {
-//                  return StaggeredGridView.extentBuilder(
-////            crossAxisCount: 3,
-//                    maxCrossAxisExtent: dimens.width / 2,
-//                    itemCount: allNotesModel.allNotes.length,
-//                    itemBuilder: (BuildContext context, int index) {
-//                      Note indexNote = allNotesModel.allNotes[index];
-//                      print("Index Note - index $index: $indexNote");
-//                      return NoteCard(
-//                        note: indexNote,
-////                    selectionMode: _longPressActivated,
-//                        selectionMode: allNotesModel.mode.value,
-//                      );
-//                    },
-//                    staggeredTileBuilder: (int index) => StaggeredTile.fit(1),
-//                    mainAxisSpacing: 10,
-//                    crossAxisSpacing: 10,
-//                  );
-
-                // changed to listview, thought there was an issue with the gridview package
-                  return ListView.separated(
-                    separatorBuilder: (context, index) {
-                      return SizedBox(
-                        height: 6,
-                      );
-                    },
-                    itemCount: allNotesModel.allNotes.length,
-                    itemBuilder: (context, index) {
-                      Note indexNote = allNotesModel.allNotes[index];
-//                      print("Index Note - index $index: $indexNote");
-                      return NoteCard(
-                        note: indexNote,
-                      );
-                    },
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxHeight: dimens.height),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            "PINNED",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey.withOpacity(0.7),
+                            ),
+                          ),
+                          StaggeredGridView.extentBuilder(
+//            crossAxisCount: 3,
+                            maxCrossAxisExtent: dimens.width / 2,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: allNotesModel.pinnedNotes.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              Note indexNote = allNotesModel.pinnedNotes[index];
+                              return NoteCard(
+                                key: Key("${indexNote.id}"),
+                                note: indexNote,
+                              );
+                            },
+                            shrinkWrap: true,
+                            staggeredTileBuilder: (int index) =>
+                                StaggeredTile.fit(1),
+                            mainAxisSpacing: 10,
+                            crossAxisSpacing: 10,
+                          ),
+                          SizedBox(
+                            height: 6,
+                          ),
+                          Text(
+                            "OTHERS",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey.withOpacity(0.7),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 6,
+                          ),
+                          Expanded(
+                            child: StaggeredGridView.extentBuilder(
+                              physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              maxCrossAxisExtent: dimens.width / 2,
+                              itemCount: allNotesModel.allNotes.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                Note indexNote = allNotesModel.allNotes[index];
+                                return NoteCard(
+                                  key: Key("${indexNote.id}"),
+                                  note: indexNote,
+                                );
+                              },
+                              staggeredTileBuilder: (int index) =>
+                                  StaggeredTile.fit(1),
+                              mainAxisSpacing: 10,
+                              crossAxisSpacing: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   );
                 },
               ),

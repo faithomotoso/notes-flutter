@@ -10,6 +10,9 @@ class AllNotesModel extends ChangeNotifier{
   List<Note> _allNotes = [];
   List<Note> get allNotes => _allNotes;
 
+  List<Note> _pinnedNotes = [];
+  List<Note> get pinnedNotes => _pinnedNotes;
+
   List<Note> _selectedNotes = [];
   List<Note> get selectedNotes => _selectedNotes;
 
@@ -20,6 +23,11 @@ class AllNotesModel extends ChangeNotifier{
     _allNotes.clear();
     await _databaseService.init();
     _allNotes = await _databaseService.getAllNotes();
+
+    // add pinned notes
+//    _pinnedNotes.addAll(_allNotes.where((note) => note.isPinned));
+    _pinnedNotes = _allNotes.where((note) => note.isPinned).toList();
+    print("Pinned notes: $_pinnedNotes");
     notifyListeners();
   }
 
@@ -41,19 +49,22 @@ class AllNotesModel extends ChangeNotifier{
   }
 
   Future deleteSelectedNotes() async {
-    _selectedNotes.forEach((note) async {
-//      _allNotes.removeWhere((n) => n.id == note.id);
-      print("Deleting: ${_allNotes.remove(note)}");
-//      await _databaseService.deleteNote(note: note);
-    });
     mode.value = false;
-    _selectedNotes.clear();
-    notifyListeners();
-//    loadNotes();
-  }
+    _selectedNotes.forEach((note) async {
+      try {
+        _allNotes.removeWhere((n) => n.id == note.id);
 
-  void delete(){
-    _allNotes.removeAt(0);
+        // if note is pinned, delete from pinned notes
+        if (note.isPinned){
+          _pinnedNotes.removeWhere((n) => n.id == note.id);
+        }
+
+        await _databaseService.deleteNote(note: note);
+      } on Exception catch (e) {
+        debugPrint("Error deleting note: $note -> ${e.toString()}");
+      }
+    });
+    _selectedNotes.clear();
     notifyListeners();
   }
 

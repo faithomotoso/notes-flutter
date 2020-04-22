@@ -12,22 +12,32 @@ class NoteViewModel extends ChangeNotifier {
   void createNewNote({@required String title, @required String note}) async {
     // if title is empty store as null
     Note newNote = Note(title: title, note: note, createdAt: DateTime.now().toString());
-    int result = await _databaseService.createNote(newNote: newNote);
+    try {
+      int result = await _databaseService.createNote(newNote: newNote);
+    } on Exception catch (e) {
+      debugPrint("Error creating note: ${e.toString()}");
+    }
     _allNotesModel.loadNotes();
-//    print("Creating note result: $result");
   }
 
 
   void saveNote(
-      {@required Note note, String titleText, String noteText}) async {
-    // index for database sim
-    await _databaseService.saveNote(
-        note: note, titleText: titleText, noteText: noteText);
+      {@required Note note, String titleText, String noteText, @required bool isPinned}) async {
+    try {
+      await _databaseService.saveNote(
+          note: note, titleText: titleText, noteText: noteText, isPinned: isPinned);
+    } on Exception catch (e) {
+      debugPrint("Error saving note: ${e.toString()}");
+    }
     _allNotesModel.loadNotes();
   }
 
   void deleteNote({@required Note note}) async {
-    await _databaseService.deleteNote(note: note);
+    try {
+      await _databaseService.deleteNote(note: note);
+    } on Exception catch (e) {
+      debugPrint("Error deleting note: ${e.toString()}");
+    }
     _allNotesModel.loadNotes();
   }
 }

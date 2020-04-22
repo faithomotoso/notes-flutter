@@ -11,13 +11,13 @@ import 'package:provider/provider.dart';
 //bool _isSelected = false;
 class NoteCard extends StatefulWidget {
   final Note note;
+  final Key key;
 
   // not using these
   final VoidCallback onLongPress;
   final VoidCallback onTap; // call when longpress is activated
-  bool selectionMode; // true for bulk selection
 
-  NoteCard({this.note, this.onLongPress, this.onTap, this.selectionMode});
+  NoteCard({this.note, this.onLongPress, this.onTap, this.key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -39,6 +39,14 @@ class _NoteCardState extends State<NoteCard> {
   @override
   Widget build(BuildContext context) {
     final AllNotesModel _allNotesModel = Provider.of<AllNotesModel>(context);
+
+//    _allNotesModel.mode.addListener((){
+//      if (_allNotesModel.mode.value == false){
+//        setState(() {
+//          _isSelected = false;
+//        });
+//      }
+//    });
 
     void select(){
 

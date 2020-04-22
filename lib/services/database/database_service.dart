@@ -24,7 +24,6 @@ class DatabaseService implements DatabaseAbs {
     String systemDbPath = await getDatabasesPath();
     String dbPath = join(systemDbPath, DbNames.dbName);
 //    _db = await openDatabase(dbPath, version: 1, onCreate: onCreateDb);
-//    print("Databse23: $_db");
     return await openDatabase(dbPath, version: 1, onCreate: onCreateDb);;
   }
 
@@ -36,7 +35,8 @@ class DatabaseService implements DatabaseAbs {
     ${DbNames.titleTextCol} TEXT,
     ${DbNames.noteTextCol} TEXT,
     ${DbNames.createdAtCol} TEXT,
-    ${DbNames.modifiedAtCol} TEXT
+    ${DbNames.modifiedAtCol} TEXT,
+    ${DbNames.isPinned} INTEGER NOT NULL DEFAULT 0
     )
     """);
   }
@@ -64,10 +64,11 @@ class DatabaseService implements DatabaseAbs {
   }
 
   @override
-  Future<int> saveNote({Note note, String titleText, String noteText}) async {
+  Future<int> saveNote({Note note, String titleText, String noteText, bool isPinned}) async {
     
     note.title = titleText;
     note.note = noteText;
+    note.isPinned = isPinned ?? false; // default to false if null // TODO remove default
     note.modifiedAt = DateTime.now().toString();
     
     int result = await _db.update(DbNames.tableName, note.toMap(),

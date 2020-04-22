@@ -13,19 +13,21 @@ class Note{
   String note;
   String createdAt;
   String modifiedAt;
+  bool isPinned;
 
   Note({
     this.title = '',
     this.note,
     this.createdAt,
-    this.modifiedAt
+    this.modifiedAt,
+    this.isPinned = false
 });
 
 
   @override
   String toString() {
     super.toString();
-    return "ID: $id - Title: $title - Note: $note";
+    return "ID: $id - Title: $title - Note: $note - Pinned: $isPinned";
   }
 
   Note.fromMap(Map<String, dynamic> map){
@@ -34,6 +36,7 @@ class Note{
     this.note = map[DbNames.noteTextCol];
     this.createdAt = map[DbNames.createdAtCol];
     this.modifiedAt = map[DbNames.modifiedAtCol];
+    this.isPinned = map[DbNames.isPinned] == 0 ? false : true;
   }
 
   toMap(){
@@ -42,7 +45,8 @@ class Note{
       DbNames.titleTextCol: this.title,
       DbNames.noteTextCol: this.note,
       DbNames.createdAtCol: this.createdAt,
-      DbNames.modifiedAtCol: this.modifiedAt
+      DbNames.modifiedAtCol: this.modifiedAt,
+      DbNames.isPinned: this.isPinned == false ? 0 : 1
     });
   }
 }

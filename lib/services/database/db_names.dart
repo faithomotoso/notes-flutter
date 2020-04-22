@@ -6,6 +6,7 @@ class DbNames{
   static String _titleTextCol = "note_title";
   static String _createdAtCol = "created_at";
   static String _modifiedAtCol = "modified_at";
+  static String _isPinned = "is_pinned";
 
   static String get dbName => _dbName;
   static String get tableName => _tableName;
@@ -14,4 +15,5 @@ class DbNames{
   static String get titleTextCol => _titleTextCol;
   static String get createdAtCol => _createdAtCol;
   static String get modifiedAtCol => _modifiedAtCol;
+  static String get isPinned => _isPinned;
 }
