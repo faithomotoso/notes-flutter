@@ -14,7 +14,7 @@ class DatabaseService implements DatabaseAbs {
   Database _db;
 
   init() async {
-    if (_db == null){
+    if (_db == null) {
       _db = await openDb();
     }
   }
@@ -23,8 +23,7 @@ class DatabaseService implements DatabaseAbs {
   Future<Database> openDb() async {
     String systemDbPath = await getDatabasesPath();
     String dbPath = join(systemDbPath, DbNames.dbName);
-//    _db = await openDatabase(dbPath, version: 1, onCreate: onCreateDb);
-    return await openDatabase(dbPath, version: 1, onCreate: onCreateDb);;
+    return await openDatabase(dbPath, version: 1, onCreate: onCreateDb);
   }
 
   @override
@@ -45,35 +44,42 @@ class DatabaseService implements DatabaseAbs {
   Future<int> createNote({Note newNote}) async {
     int result = await _db.insert(DbNames.tableName, newNote.toMap(),
         conflictAlgorithm: ConflictAlgorithm.fail);
-    
+
     return result;
   }
 
   @override
   Future<int> deleteNote({Note note}) async {
-    int result = await _db.delete(DbNames.tableName, where: "id = ?", whereArgs: [note.id]);
+    int result = await _db
+        .delete(DbNames.tableName, where: "id = ?", whereArgs: [note.id]);
     return result;
   }
 
   @override
   Future<List<Note>> getAllNotes() async {
-    final List<Map<String, dynamic>> list = await _db.query(DbNames.tableName, orderBy: "${DbNames.idCol} DESC");
+    final List<Map<String, dynamic>> list =
+        await _db.query(DbNames.tableName, orderBy: "${DbNames.idCol} DESC");
 
     list.forEach((map) => _notes.add(Note.fromMap(map)));
     return _notes;
   }
 
   @override
-  Future<int> saveNote({Note note, String titleText, String noteText, bool isPinned}) async {
-    
+  Future<int> saveNote(
+      {Note note, String titleText, String noteText, bool isPinned}) async {
     note.title = titleText;
     note.note = noteText;
-    note.isPinned = isPinned ?? false; // default to false if null // TODO remove default
+    note.isPinned = isPinned;
     note.modifiedAt = DateTime.now().toString();
-    
+
     int result = await _db.update(DbNames.tableName, note.toMap(),
         where: "id = ?", whereArgs: [note.id]);
-    
+
     return result;
+  }
+
+  Future updateNotePinStatus({Note note}) async {
+    await _db.update(DbNames.tableName, note.toMap(),
+        where: "id = ?", whereArgs: [note.id]);
   }
 }

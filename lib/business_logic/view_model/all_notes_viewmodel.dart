@@ -16,8 +16,42 @@ class AllNotesModel extends ChangeNotifier{
   List<Note> _selectedNotes = [];
   List<Note> get selectedNotes => _selectedNotes;
 
-//  bool longPressActivated = false;
   ValueNotifier mode = ValueNotifier<bool>(false); // use for enabling or disabling selection mode
+
+  bool evalPinnedIcon(){
+    // this method should be called when a note is selected
+    // result would determine the pin icon to display in home.dart and action
+    // to carry out when tapped
+    bool def = true;
+
+    _selectedNotes.forEach((n) => def &= n.isPinned);
+    return def;
+  }
+
+  void pinUnpinSelectedNotes(){
+    bool action = evalPinnedIcon(); // if false => pin unpinned notes, if true => unpin pinned notes
+    if (!action){
+      _selectedNotes.forEach((n){
+        if (!n.isPinned){
+          // pinning unpinned notes
+          n.isPinned = true;
+          _databaseService.updateNotePinStatus(note: n);
+          _pinnedNotes.add(n);
+        }
+      });
+    } else {
+      // unpin notes
+      _selectedNotes.forEach((n){
+        n.isPinned = false;
+        _databaseService.updateNotePinStatus(note: n);
+        _pinnedNotes.removeWhere((note) => note.id == n.id);
+      });
+    }
+    mode.value = false;
+    _selectedNotes.clear();
+    _pinnedNotes.sort((a, b) => b.id.compareTo(a.id));
+    notifyListeners();
+  }
 
   void loadNotes() async {
     _allNotes.clear();
@@ -25,9 +59,7 @@ class AllNotesModel extends ChangeNotifier{
     _allNotes = await _databaseService.getAllNotes();
 
     // add pinned notes
-//    _pinnedNotes.addAll(_allNotes.where((note) => note.isPinned));
     _pinnedNotes = _allNotes.where((note) => note.isPinned).toList();
-    print("Pinned notes: $_pinnedNotes");
     notifyListeners();
   }
 
@@ -41,12 +73,6 @@ class AllNotesModel extends ChangeNotifier{
     notifyListeners();
   }
 
-  @override
-  void notifyListeners() {
-    super.notifyListeners();
-//    print(_allNotes);
-//    print("Length: ${_allNotes.length}");
-  }
 
   Future deleteSelectedNotes() async {
     mode.value = false;

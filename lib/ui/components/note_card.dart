@@ -8,16 +8,11 @@ import 'package:notekeeper_flutter_solo/helpers/helpers.dart';
 import 'package:notekeeper_flutter_solo/ui/screens/create_edit_note.dart';
 import 'package:provider/provider.dart';
 
-//bool _isSelected = false;
 class NoteCard extends StatefulWidget {
   final Note note;
   final Key key;
 
-  // not using these
-  final VoidCallback onLongPress;
-  final VoidCallback onTap; // call when longpress is activated
-
-  NoteCard({this.note, this.onLongPress, this.onTap, this.key}) : super(key: key);
+  NoteCard({this.note, this.key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -35,98 +30,112 @@ class _NoteCardState extends State<NoteCard> {
     note = widget.note;
   }
 
-
   @override
   Widget build(BuildContext context) {
     final AllNotesModel _allNotesModel = Provider.of<AllNotesModel>(context);
 
-//    _allNotesModel.mode.addListener((){
-//      if (_allNotesModel.mode.value == false){
-//        setState(() {
-//          _isSelected = false;
-//        });
-//      }
-//    });
+    _allNotesModel.mode.addListener(() {
+      if (_allNotesModel.mode.value == false) {
+        if (this.mounted) {
+          setState(() {
+            _isSelected = false;
+          });
+        }
+      }
+    });
 
-    void select(){
-
+    void select() {
       _isSelected = !_isSelected;
 
-      if (_allNotesModel.mode.value && _allNotesModel.selectedNotes.length == 1 && !_isSelected){
-//        _allNotesModel.longPressActivated = false;
+      if (_allNotesModel.mode.value &&
+          _allNotesModel.selectedNotes.length == 1 &&
+          !_isSelected) {
         _allNotesModel.mode.value = false; // cancel selection mode
         _allNotesModel.selectedNotes.clear();
       } else {
-//        _allNotesModel.longPressActivated = true;
         _allNotesModel.mode.value = true; // activate selection mode
       }
 
-      if (_allNotesModel.mode.value){
-        if (_isSelected){
+      if (_allNotesModel.mode.value) {
+        if (_isSelected) {
           _allNotesModel.addToSelectedNotes(note: note);
         } else {
           _allNotesModel.removeFromSelectedNotes(note: note);
         }
       }
 
-      print("Selected notes: ${_allNotesModel.selectedNotes}");
-
+      _allNotesModel.evalPinnedIcon(); // evaluate the pinned icon here
     }
 
-    return OpenContainer(
-      transitionType: ContainerTransitionType.fadeThrough,
-      openBuilder: (BuildContext context, VoidCallback _) {
-        return CreateEditNote(
-          note: note,
-        );
-      },
-      closedBuilder: (BuildContext context, VoidCallback openContainer) {
-        return InkWell(
-          onTap: () {
-            if (!_isSelected && !_allNotesModel.mode.value) {
-              openContainer();
-            } else {
+    return Container(
+      decoration:
+          BoxDecoration(borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+        BoxShadow(
+            color: Colors.white.withOpacity(0.4),
+            spreadRadius: 1,
+            blurRadius: 4.5)
+      ]
+          ),
+      child: OpenContainer(
+        transitionType: ContainerTransitionType.fadeThrough,
+        openBuilder: (BuildContext context, VoidCallback _) {
+          return CreateEditNote(
+            note: note,
+          );
+        },
+        closedShape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+//        closedElevation: 3.5,
+        closedBuilder: (BuildContext context, VoidCallback openContainer) {
+          return InkWell(
+            onTap: () {
+              if (!_isSelected && !_allNotesModel.mode.value) {
+                openContainer();
+              } else {
+                setState(() {
+                  select();
+                });
+              }
+            },
+            onLongPress: () async {
               setState(() {
-//                _isSelected = !_isSelected;
                 select();
               });
-            }
-          },
-          onLongPress: () async {
-            setState(() {
-            select();
-            });
-          },
-          child: Container(
-            decoration: BoxDecoration(
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                    color: !_isSelected ? primaryColor : Colors.redAccent),
-                borderRadius: BorderRadius.circular(10)),
-            padding: EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                note.title.isNotEmpty
-                    ? Text(
-                        note.title,
-                        style: titleTextStyle(context: context),
-                      )
-                    : SizedBox(),
-                SizedBox(
-                  height: note.title.isNotEmpty ? 6 : 0,
-                ),
-                note.note.isNotEmpty
-                    ? Text(
-                        note.note,
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                      )
-                    : SizedBox()
-              ],
+                    color:
+                        !_isSelected ? Colors.transparent : Colors.redAccent),
+              ),
+              padding: EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  note.title.isNotEmpty
+                      ? Text(
+                          note.title,
+                          style: titleTextStyle(context: context),
+                        )
+                      : SizedBox(),
+                  SizedBox(
+                    height: note.title.isNotEmpty ? 6 : 0,
+                  ),
+                  note.note.isNotEmpty
+                      ? Text(
+                          note.note,
+                          maxLines: 4,
+                          overflow: TextOverflow.ellipsis,
+                        )
+                      : SizedBox()
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

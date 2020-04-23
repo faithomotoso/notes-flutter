@@ -3,7 +3,6 @@ import 'package:notekeeper_flutter_solo/business_logic/view_model/all_notes_view
 import 'package:notekeeper_flutter_solo/business_logic/view_model/note_viewmodel.dart';
 import 'package:notekeeper_flutter_solo/services/database/database.dart';
 import 'package:notekeeper_flutter_solo/services/database/database_service.dart';
-import 'package:notekeeper_flutter_solo/services/database/database_sim.dart';
 
 GetIt serviceLocator = GetIt.instance;
 

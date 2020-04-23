@@ -2,11 +2,9 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:notekeeper_flutter_solo/business_logic/model/Note.dart';
-import 'package:notekeeper_flutter_solo/business_logic/view_model/all_notes_viewmodel.dart';
 import 'package:notekeeper_flutter_solo/business_logic/view_model/note_viewmodel.dart';
 import 'package:notekeeper_flutter_solo/helpers/custom_colors.dart';
 import 'package:notekeeper_flutter_solo/helpers/helpers.dart';
-import 'package:notekeeper_flutter_solo/services/service_locator.dart';
 import 'package:notekeeper_flutter_solo/utils/dimens.dart';
 import 'package:provider/provider.dart';
 
@@ -23,8 +21,6 @@ class CreateEditNote extends StatefulWidget {
 
 class _CreateEditNoteState extends State<CreateEditNote> {
   Dimens dimens;
-
-//  NoteViewModel _noteViewModel;
 
   final TextEditingController titleController = TextEditingController();
   final TextEditingController noteController = TextEditingController();
@@ -53,11 +49,9 @@ class _CreateEditNoteState extends State<CreateEditNote> {
   Widget build(BuildContext context) {
     dimens = Dimens(context);
     final NoteViewModel _noteViewModel = Provider.of<NoteViewModel>(context);
-//    final AllNotesModel allNotesModel = Provider.of<AllNotesModel>(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
-//      appBar: appBar(title: "Add Note"),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -93,7 +87,9 @@ class _CreateEditNoteState extends State<CreateEditNote> {
                         SizedBox(
                           width: 4,
                         ),
-                        pinned != null ? _pinButton(noteViewModel: _noteViewModel) : SizedBox(),
+                        pinned != null
+                            ? _pinButton(noteViewModel: _noteViewModel)
+                            : SizedBox(),
                         SizedBox(
                           width: 4,
                         ),
@@ -134,7 +130,6 @@ class _CreateEditNoteState extends State<CreateEditNote> {
                           height: 14,
                         ),
                         Expanded(
-//                        height: 30,
                           child: Container(
                             child: TextField(
                               decoration: InputDecoration.collapsed(
@@ -240,12 +235,10 @@ class _CreateEditNoteState extends State<CreateEditNote> {
   void _backButtonChanges(
       {@required NoteViewModel noteViewModel, @required Note note}) {
     // show a dialog if changes has been made to title or note
-    if (noteController.text.isNotEmpty || titleController.text.isNotEmpty){
-
+    if (noteController.text.isNotEmpty || titleController.text.isNotEmpty) {
       if (!(_oldNoteText == noteController.text) ||
           !(_oldTitleText == titleController.text) ||
-          !(_oldPinnedStatus == pinned)
-      ) {
+          !(_oldPinnedStatus == pinned)) {
         // changes detected
         showModal(
             context: context,
@@ -281,8 +274,13 @@ class _CreateEditNoteState extends State<CreateEditNote> {
                               onPressed: () {
                                 Navigator.pop(context);
                               },
-                              child: Text("No"),
-                              color: Colors.redAccent.withOpacity(0.8),
+                              child: Text(
+                                "No",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              color: Colors.redAccent.withOpacity(0.9),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(18)),
                               padding: EdgeInsets.zero,
@@ -295,8 +293,13 @@ class _CreateEditNoteState extends State<CreateEditNote> {
                                 Navigator.pop(context,
                                     true); // pass true to discard changes
                               },
-                              child: Text("Yes"),
-                              color: Colors.green.withOpacity(0.8),
+                              child: Text(
+                                "Yes",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              color: Colors.green.withOpacity(0.9),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(18)),
                               padding: EdgeInsets.zero,
@@ -324,6 +327,5 @@ class _CreateEditNoteState extends State<CreateEditNote> {
       // new note tapped but nothing typed
       Navigator.pop(context);
     }
-
   }
 }

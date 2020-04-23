@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:notekeeper_flutter_solo/business_logic/model/Note.dart';
 import 'package:notekeeper_flutter_solo/business_logic/view_model/all_notes_viewmodel.dart';
-import 'package:notekeeper_flutter_solo/services/database/database.dart';
 import 'package:notekeeper_flutter_solo/services/database/database_service.dart';
 import 'package:notekeeper_flutter_solo/services/service_locator.dart';
 
@@ -13,7 +12,7 @@ class NoteViewModel extends ChangeNotifier {
     // if title is empty store as null
     Note newNote = Note(title: title, note: note, createdAt: DateTime.now().toString());
     try {
-      int result = await _databaseService.createNote(newNote: newNote);
+      await _databaseService.createNote(newNote: newNote);
     } on Exception catch (e) {
       debugPrint("Error creating note: ${e.toString()}");
     }
