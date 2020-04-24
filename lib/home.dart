@@ -109,16 +109,17 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               );
             },
           ),
-          body: Container(
-            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 6),
-            color: _bgColor,
-            child: ChangeNotifierProvider.value(
-              value: _allNotesModel,
-              child: Consumer<AllNotesModel>(
-                builder: (context, allNotesModel, child) {
-                  return LayoutBuilder(
-                    builder: (context, constraints) {
-                      return SingleChildScrollView(
+          body: SafeArea(
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 6),
+              color: _bgColor,
+              child: ChangeNotifierProvider.value(
+                value: _allNotesModel,
+                child: Consumer<AllNotesModel>(
+                  builder: (context, allNotesModel, child) {
+                    return LayoutBuilder(
+                      builder: (context, constraints) {
+                      return allNotesModel.allNotes.isNotEmpty ? SingleChildScrollView(
                         physics: BouncingScrollPhysics(),
                         child: ConstrainedBox(
                           constraints:
@@ -200,10 +201,19 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                             ],
                           ),
                         ),
+                      ) : Center(
+                        child: Text(
+                          "Wow... such empty 🌚",
+                          style: GoogleFonts.dancingScript(
+                            color: Theme.of(context).primaryColor,
+                            fontSize: 22
+                          ),
+                        )
                       );
-                    },
-                  );
-                },
+                      },
+                    );
+                  },
+                ),
               ),
             ),
           ),
